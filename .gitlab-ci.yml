@@ -1,0 +1,61 @@
+# Frontend Pipeline Stages
+stages:
+  - acquire-backend
+  - build
+  - deploy
+
+variables:
+  PATH_SOURCE_BACKEND: "C:\\Program Files\\Backend Project Integration 4"
+  
+default:
+  tags:
+    - windows
+  before_script:
+    - $env:PATH += ";$CI_PROJECT_DIR\build\vcpkg_installed\x64-windows\bin"
+    - $ErrorActionPreference = "Stop"
+
+# Stage: Acquire Backend Artifacts 
+acquire-backend-job:
+  stage: acquire-backend
+  script:
+    - echo "Adquirindo artefatos compartilhados da pasta fixa..."
+    - New-Item -Path "$CI_PROJECT_DIR\build\backend\Release" -ItemType Directory -Force
+    - New-Item -Path "$CI_PROJECT_DIR\build\frontend\Release" -ItemType Directory -Force
+
+    - Copy-Item -Path "$env:PATH_SOURCE_BACKEND\Projeto GRPC.exe" -Destination "$CI_PROJECT_DIR\build\backend\Release\" -Force
+    - Copy-Item -Path "$env:PATH_SOURCE_BACKEND\Projeto GRPC_lib.lib" -Destination "$CI_PROJECT_DIR\build\backend\Release\" -Force
+  artifacts:
+    name: "backend-artifacts-$CI_COMMIT_REF_SLUG"
+    paths:
+      - build/backend/Release/Projeto GRPC
+      - build/backend/Release/Projeto GRPC_lib.lib
+    expire_in: 2 days
+
+# Stage: Build
+build-job:
+  stage: build
+  script:
+    - cmake -B build -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake" -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
+    - cmake --build build --config Release
+  artifacts:
+    name: "build-binaries-$CI_COMMIT_REF_SLUG"
+    paths:
+      - build/frontend/Release/
+    expire_in: 14 days
+
+
+deploy-job:
+  stage: deploy
+  environment: production
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
+  dependencies:
+    - acquire-backend-job
+  script:
+    - echo "Criando pacote auto-extraível (.exe)..."
+    - & "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\build\backend\Release\Projeto GRPC.exe .\build\frontend\Release\Display.exe
+  artifacts:
+    name: "Release-Package-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./Projeto_Completo.exe
+    expire_in: 5 days
