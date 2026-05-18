@@ -18,17 +18,21 @@ default:
 acquire-backend-job:
   stage: acquire-backend
   script:
-    - echo "Adquirindo artefatos compartilhados da pasta fixa..."
-    - New-Item -Path "$CI_PROJECT_DIR\build\backend\Release" -ItemType Directory -Force
-    - New-Item -Path "$CI_PROJECT_DIR\build\frontend\Release" -ItemType Directory -Force
+    - - echo "Adquirindo artefatos compartilhados da pasta fixa..."
+    - New-Item -Path "$CI_PROJECT_DIR\backend_binaries" -ItemType Directory -Force
+    - New-Item -Path "$CI_PROJECT_DIR\backend_binaries\generated" -ItemType Directory -Force
+    - New-Item -Path "$CI_PROJECT_DIR\backend_binaries\include" -ItemType Directory -Force 
 
-    - Copy-Item -Path "$env:PATH_SOURCE_BACKEND\Projeto GRPC.exe" -Destination "$CI_PROJECT_DIR\build\backend\Release\" -Force
-    - Copy-Item -Path "$env:PATH_SOURCE_BACKEND\Projeto GRPC_lib.lib" -Destination "$CI_PROJECT_DIR\build\backend\Release\" -Force
+    - Copy-Item -Path "$PATH_SOURCE_BACKEND\Projeto_GRPC.exe" -Destination "$CI_PROJECT_DIR\backend_binaries\" -Force
+    - Copy-Item -Path "$PATH_SOURCE_BACKEND\Projeto_GRPC_lib.lib" -Destination "$PATH_DEPLOY_BACKEND\" -Force
+    - Copy-Item -Path "$PATH_SOURCE_BACKEND\generated\*.h" -Destination "$CI_PROJECT_DIR\backend_binaries\generated\" -Force
+    - Copy-Item -Path "$PATH_SOURCE_BACKEND\include\*" -Destination "$CI_PROJECT_DIR\backend_binaries\include\" -Recurse -Force
+
+  artifacts:
   artifacts:
     name: "backend-artifacts-$CI_COMMIT_REF_SLUG"
     paths:
-      - build/backend/Release/Projeto GRPC
-      - build/backend/Release/Projeto GRPC_lib.lib
+      - backend_binaries/
     expire_in: 2 days
 
 # Stage: Build
@@ -53,7 +57,7 @@ deploy-job:
     - acquire-backend-job
   script:
     - echo "Criando pacote auto-extraível (.exe)..."
-    - & "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\build\backend\Release\Projeto GRPC.exe .\build\frontend\Release\Display.exe
+    - & "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\backend_binaries\Projeto_GRPC.exe .\build\Release\Display.exe
   artifacts:
     name: "Release-Package-$CI_COMMIT_SHORT_SHA"
     paths:

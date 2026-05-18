@@ -3,11 +3,17 @@ project(Display)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-find_package(Projeto_GRPC REQUIRED)
-
 find_package(wxWidgets REQUIRED COMPONENTS core base)
 include(${wxWidgets_USE_FILE})
 
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+
+add_library(Backend_lib STATIC IMPORTED)
+
+set_target_properties(Backend_lib PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/backend_binaries/Projeto_GRPC_lib.lib"
+)
 add_library(${PROJECT_NAME}_lib STATIC)
 
 target_sources(${PROJECT_NAME}_lib
@@ -18,12 +24,16 @@ target_sources(${PROJECT_NAME}_lib
 target_include_directories(${PROJECT_NAME}_lib 
     PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_repo/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_binaries/generated        
 )
 
 target_link_libraries(${PROJECT_NAME}_lib
     PUBLIC
         ${wxWidgets_LIBRARIES}
-        ProjetoGRPC::ProjetoGRPC
+        Backend_lib
+        protobuf::libprotobuf
+        gRPC::grpc++
 )
 
 add_executable(${PROJECT_NAME} WIN32)
