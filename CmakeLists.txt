@@ -24,7 +24,7 @@ target_sources(${PROJECT_NAME}_lib
 target_include_directories(${PROJECT_NAME}_lib 
     PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_repo/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_binaries/include
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_binaries/generated        
 )
 
