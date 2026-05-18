@@ -57,7 +57,7 @@ deploy-job:
     - acquire-backend-job
   script:
     - echo "Criando pacote auto-extraível (.exe)..."
-    - & "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\backend_binaries\Projeto_GRPC.exe .\build\Release\Display.exe
+    - '& "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\backend_binaries\Projeto_GRPC.exe .\build\Release\Display.exe'
   artifacts:
     name: "Release-Package-$CI_COMMIT_SHORT_SHA"
     paths:
