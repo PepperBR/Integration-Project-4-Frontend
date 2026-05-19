@@ -29,7 +29,6 @@ acquire-backend-job:
     - Copy-Item -Path "$PATH_SOURCE_BACKEND\include\*" -Destination "$CI_PROJECT_DIR\backend_binaries\include\" -Recurse -Force
 
   artifacts:
-  artifacts:
     name: "backend-artifacts-$CI_COMMIT_REF_SLUG"
     paths:
       - backend_binaries/
@@ -55,7 +54,7 @@ deploy-job:
     - if: $CI_COMMIT_BRANCH == 'main'
   dependencies:
     - acquire-backend-job
-    - build-frontend-job
+    - build-job
   script:
     - echo "Criando pacote auto-extraível (.exe)..."
     - '& "C:\Program Files\7-Zip\7z.exe" a -sfx Projeto_Completo.exe .\backend_binaries\Projeto_GRPC.exe .\build\Release\Display.exe'
