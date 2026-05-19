@@ -44,7 +44,7 @@ build-job:
   artifacts:
     name: "build-binaries-$CI_COMMIT_REF_SLUG"
     paths:
-      - build/frontend/Release/
+      - build/Release/
     expire_in: 14 days
 
 
