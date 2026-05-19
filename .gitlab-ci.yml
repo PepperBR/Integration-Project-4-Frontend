@@ -24,7 +24,7 @@ acquire-backend-job:
     - New-Item -Path "$CI_PROJECT_DIR\backend_binaries\include" -ItemType Directory -Force 
 
     - Copy-Item -Path "$PATH_SOURCE_BACKEND\Projeto_GRPC.exe" -Destination "$CI_PROJECT_DIR\backend_binaries\" -Force
-    - Copy-Item -Path "$PATH_SOURCE_BACKEND\Projeto_GRPC_lib.lib" -Destination "$PATH_DEPLOY_BACKEND\" -Force
+    - Copy-Item -Path "$PATH_SOURCE_BACKEND\Projeto_GRPC_lib.lib" -Destination "$CI_PROJECT_DIR\backend_binaries\" -Force
     - Copy-Item -Path "$PATH_SOURCE_BACKEND\generated\*.h" -Destination "$CI_PROJECT_DIR\backend_binaries\generated\" -Force
     - Copy-Item -Path "$PATH_SOURCE_BACKEND\include\*" -Destination "$CI_PROJECT_DIR\backend_binaries\include\" -Recurse -Force
 
